@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>✦ Reveal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Cinzel+Decorative:wght@400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --ink: #0a0a0a;
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --cream: #f5f0e8;
+      --dust: #2a2416;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: var(--ink);
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    /* ─── SPLASH ─── */
+    #splash {
+      position: fixed; inset: 0; z-index: 100;
+      background: var(--ink);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2rem;
+      transition: opacity 0.9s ease 0.2s, transform 0.9s cubic-bezier(0.76,0,0.24,1) 0.2s;
+    }
+    #splash.exit {
+      opacity: 0;
+      transform: scale(1.04);
+      pointer-events: none;
+    }
+
+    /* grain overlay */
+    #splash::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    /* animated rings */
+    .rings {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+    }
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.12);
+      animation: pulse-ring 4s ease-out infinite;
+    }
+    .ring:nth-child(1) { width: 200px; height: 200px; animation-delay: 0s; }
+    .ring:nth-child(2) { width: 340px; height: 340px; animation-delay: 0.6s; }
+    .ring:nth-child(3) { width: 500px; height: 500px; animation-delay: 1.2s; }
+    .ring:nth-child(4) { width: 680px; height: 680px; animation-delay: 1.8s; }
+
+    @keyframes pulse-ring {
+      0%   { opacity: 0; transform: scale(0.85); }
+      40%  { opacity: 1; }
+      100% { opacity: 0; transform: scale(1.1); }
+    }
+
+    /* logo mark */
+    .emblem {
+      position: relative;
+      width: 90px; height: 90px;
+      animation: emblem-in 1.2s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes emblem-in {
+      from { opacity: 0; transform: scale(0.6) rotate(-20deg); }
+      to   { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+    .emblem svg { width: 100%; height: 100%; }
+
+    /* rotating text ring */
+    .text-ring {
+      position: absolute; inset: -36px;
+      animation: spin 18s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* title */
+    .splash-title {
+      position: relative;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      color: var(--gold-light);
+      letter-spacing: 0.18em;
+      text-align: center;
+      animation: title-in 1.4s cubic-bezier(0.22,1,0.36,1) 0.3s both;
+      line-height: 1.3;
+    }
+    @keyframes title-in {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .splash-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: 1.05rem;
+      color: rgba(201,168,76,0.55);
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      animation: title-in 1.4s cubic-bezier(0.22,1,0.36,1) 0.55s both;
+    }
+
+    /* progress bar */
+    .progress-wrap {
+      width: 180px;
+      animation: title-in 1s ease 0.8s both;
+    }
+    .progress-bar {
+      height: 1px;
+      background: rgba(201,168,76,0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    .progress-fill {
+      position: absolute; top: 0; left: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      width: 0%;
+      animation: fill-bar 0.85s cubic-bezier(0.4,0,0.2,1) 0.1s forwards;
+      box-shadow: 0 0 12px var(--gold);
+    }
+    @keyframes fill-bar {
+      0%   { width: 0%; }
+      60%  { width: 78%; }
+      100% { width: 100%; }
+    }
+
+    .progress-pct {
+      text-align: right;
+      font-size: 0.7rem;
+      color: rgba(201,168,76,0.4);
+      letter-spacing: 0.2em;
+      margin-top: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ─── MAIN CONTENT ─── */
+    #main {
+      position: fixed; inset: 0;
+      background: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+
+    /* layered atmospheric background */
+    #main::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 50% 50%, rgba(201,168,76,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(201,168,76,0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .frame-container {
+      position: relative;
+      opacity: 0;
+      transform: translateY(30px) scale(0.97);
+      transition: opacity 1.2s ease, transform 1.2s cubic-bezier(0.22,1,0.36,1);
+      max-width: min(90vw, 680px);
+      width: 100%;
+    }
+    .frame-container.reveal {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* decorative corner lines */
+    .corner {
+      position: absolute;
+      width: 28px; height: 28px;
+      border-color: var(--gold);
+      border-style: solid;
+      opacity: 0.7;
+      z-index: 2;
+    }
+    .corner-tl { top: -10px; left: -10px; border-width: 1.5px 0 0 1.5px; }
+    .corner-tr { top: -10px; right: -10px; border-width: 1.5px 1.5px 0 0; }
+    .corner-bl { bottom: -10px; left: -10px; border-width: 0 0 1.5px 1.5px; }
+    .corner-br { bottom: -10px; right: -10px; border-width: 0 1.5px 1.5px 0; }
+
+    /* thin outer frame */
+    .photo-frame {
+      position: relative;
+      border: 1px solid rgba(201,168,76,0.2);
+      padding: 10px;
+      background: rgba(201,168,76,0.03);
+    }
+
+    .photo-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 78vh;
+      object-fit: contain;
+      filter: contrast(1.03) saturate(1.05);
+    }
+
+    /* shimmer sweep on reveal */
+    .shimmer {
+      position: absolute; inset: 0;
+      background: linear-gradient(115deg, transparent 30%, rgba(201,168,76,0.18) 50%, transparent 70%);
+      transform: translateX(-100%);
+      pointer-events: none;
+      z-index: 3;
+    }
+    .frame-container.reveal .shimmer {
+      animation: shimmer-sweep 1.1s ease 0.3s forwards;
+    }
+    @keyframes shimmer-sweep {
+      to { transform: translateX(200%); }
+    }
+
+    /* caption */
+    .caption {
+      text-align: center;
+      margin-top: 1.4rem;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.8s ease 0.6s, transform 0.8s ease 0.6s;
+    }
+    .frame-container.reveal .caption {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .caption-line {
+      display: block;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.35), transparent);
+      margin-bottom: 0.9rem;
+    }
+    .caption-text {
+      font-style: italic;
+      font-weight: 300;
+      font-size: 0.95rem;
+      color: rgba(201,168,76,0.5);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+    .caption-dot {
+      display: inline-block;
+      width: 4px; height: 4px;
+      background: var(--gold);
+      border-radius: 50%;
+      margin: 0 0.6rem;
+      vertical-align: middle;
+      opacity: 0.6;
+    }
+
+    /* particle stars */
+    .particles {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0;
+      animation: twinkle var(--dur, 4s) ease-in-out var(--delay, 0s) infinite;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; transform: scale(0.5); }
+      50% { opacity: var(--max-op, 0.4); transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- PARTICLES -->
+<div class="particles" id="particles"></div>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <div class="rings">
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+  </div>
+
+  <div class="emblem">
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- outer circle -->
+      <circle cx="50" cy="50" r="46" stroke="#c9a84c" stroke-width="0.8" opacity="0.5"/>
+      <!-- inner decorative star -->
+      <path d="M50 10 L53.5 43.5 L87 37 L57 55 L75 84 L50 63 L25 84 L43 55 L13 37 L46.5 43.5 Z"
+            fill="none" stroke="#c9a84c" stroke-width="0.9" stroke-linejoin="round" opacity="0.8"/>
+      <!-- center dot -->
+      <circle cx="50" cy="50" r="3.5" fill="#e8c97a" opacity="0.9"/>
+      <!-- rotating text ring -->
+      <g class="text-ring">
+        <path id="textCircle" d="M50,50 m-36,0 a36,36 0 1,1 72,0 a36,36 0 1,1 -72,0" fill="none"/>
+        <text font-size="6.5" fill="#c9a84c" opacity="0.6" font-family="Cormorant Garamond, serif" letter-spacing="3">
+          <textPath href="#textCircle">✦ MOMENT  ✦ CAPTURED  ✦ REVEALED  ✦ ETERNAL  </textPath>
+        </text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="splash-title">The Reveal</div>
+  <div class="splash-sub">Loading your moment</div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-pct" id="progressPct">0%</div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="main">
+  <div class="frame-container" id="frameContainer">
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+    <div class="shimmer"></div>
+
+    <div class="photo-frame">
+      <img src="https://i.ibb.co/wrWvMXpx/IMG-20260501-151008.jpg" alt="Captured Moment" id="mainImg"/>
+    </div>
+
+    <div class="caption">
+      <span class="caption-line"></span>
+      <span class="caption-text">
+        <span class="caption-dot"></span>
+        A moment in time
+        <span class="caption-dot"></span>
+      </span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Generate particles
+  const particlesEl = document.getElementById('particles');
+  for (let i = 0; i < 28; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 2.5 + 1;
+    p.style.cssText = `
+      width: ${size}px; height: ${size}px;
+      top: ${Math.random() * 100}%;
+      left: ${Math.random() * 100}%;
+      --dur: ${Math.random() * 5 + 3}s;
+      --delay: ${Math.random() * 6}s;
+      --max-op: ${Math.random() * 0.25 + 0.05};
+    `;
+    particlesEl.appendChild(p);
+  }
+
+  // Progress counter animation
+  const pctEl = document.getElementById('progressPct');
+  let pct = 0;
+  const pctInterval = setInterval(() => {
+    if (pct < 100) {
+      pct += Math.random() > 0.6 ? 2 : 1;
+      if (pct > 100) pct = 100;
+      pctEl.textContent = pct + '%';
+    } else {
+      clearInterval(pctInterval);
+    }
+  }, 8);
+
+  // Dismiss splash after animation completes
+  const splash = document.getElementById('splash');
+  const frame  = document.getElementById('frameContainer');
+
+  setTimeout(() => {
+    splash.classList.add('exit');
+    setTimeout(() => {
+      splash.style.display = 'none';
+      frame.classList.add('reveal');
+    }, 600);
+  }, 1000);
+</script>
+</body>
+</html>
